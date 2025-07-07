@@ -6,53 +6,73 @@
 
 ## Overview
 
-* This section could contain a short paragraph which include the following:
-  * **Definition of the tasks / challenge**  Ex: The task, as defined by the Kaggle challenge is to use a time series of 12 features, sampled daily for 1 month, to predict the next day's price of a stock.
-  * **Your approach** Ex: The approach in this repository formulates the problem as regression task, using deep recurrent neural networks as the model with the full time series of features as input. We compared the performance of 3 different network architectures.
-  * **Summary of the performance achieved** Ex: Our best model was able to predict the next day stock price within 23%, 90% of the time. At the time of writing, the best performance on Kaggle of this metric is 18%.
+This project tackles the task of detecting Parkinson’s disease using a small tabular dataset derived from vocal measurements of 32 individuals. The original dataset includes 22 numerical features per sample, with each sample tied to a voice recording from one of the individuals. The binary classification task is to determine whether the speaker has Parkinson’s based on their vocal features.
+The project was carried out in two phases:
+
+Initial Modeling: Models were trained on the original dataset using a standard train/test split and oversampling to address class imbalance. Despite achieving high precision and ROC-AUC scores, these results were likely inflated due to multicollinearity, data leakage, and overfitting.
+
+Aggregated Modeling: To improve generalizability, data was aggregated by patient using mean and variance of each feature. Models were trained using a Leave One Out approach to reflect the small sample size of the data. Random Forest performed best in this phase, with an accuracy of 0.844, though results may still be influenced by class imbalance.
+
+Across both phases, feature selection, scaling, and multiple model types (Decision Tree, KNN, Random Forest) were used and compared. Ultimately, while early models appeared promising, the aggregated approach yielded more realistic and generalizable performance.
+
+
+
+
+
 
 ## Summary of Workdone
 
 ### Data
 
-* Data:
-  * Type: Tabular data from analysis of various voice recordings. 
-  * Size: 195 rows with data from 32 individuals, 22 numerical features, 1 binary target variable 
-  * Instances (Train, Test, Validation Split): how many data points? Ex: 1000 patients for training, 200 for testing, none for validation
+* Type: Tabular data from analysis of various voice recordings.
+* Size: 195 rows with data from 32 individuals, 22 numerical features, 1 binary target variable 
+* Instances: an 80/20 5-fold cross-validation train-test split was initially used (i.e., Tabular_Prototype_ZS.ipynb), but later models (i.e., outlined in Tabular_Aggregated.ipynb) were trained and evaluated using the Leave One Out method. 
 
 #### Preprocessing / Clean up
 
-Initial preprocessing included removal of the ID column, class balancing through oversampling rows, and scaling data. Any outliers observed were kept in the data since 
+Initial preprocessing (i.e., outlined in tabular_preprocessing.py) included removal of the ID column, class balancing through oversampling rows, and scaling data. Any outliers observed were kept in the data since there were relatively few data points and variations/anomalies could have been significant for diagnosis. For the second round of modelling, a different approach was used, and data was aggregated by patient ID. These data were then scaled prior to modelling as well.
 
 #### Data Visualization
 
+![Comparison of feature distributions between binary features during EDA.](/README_files/compare_binary.png)
 
+
+![Baseline model confusion matrix showing overfitting.](/README_files/baseline_cmatrix.png)
 
 
 
 ### Problem Formulation
 
-* Define:
-  * The inputs were the various voice and audio measures from voice recordings taken in the original patient study, which include frequency, amplitude, and pitch. These were used to determine whether an individual had Parkinson's or not.
+The inputs were the various voice and audio measures from voice recordings taken in the original patient study, which include frequency, amplitude, and pitch. These were used to determine whether an individual had Parkinson's or not.
   * Models used:
-    * Decision Tree
-    * K-Nearest Neighbor (KNN)
-    * Random Forest (for aggregated data)
-  * Loss, Optimizer, other Hyperparameters.
+    * Decision Tree: primary/initial model used
+    * K-Nearest Neighbor (KNN): a simpler model used after overfitting was observed in decision tree models
+    * Random Forest: used for aggregated data to compensate for fewer data points
+During each round of modelling, different feature selection interations were utilized. For the decision trees and KNNs, features were selected with the purpose of attempting to control multicollinearity. During the random forest/aggregated data phase, initial decision trees were used to determine the most influential features from each of the mean and variance datasets, and then concatenated to create a new "combo" dataset.
+ 
 
 ### Performance Comparison
 
-* Clearly define the key performance metric(s).
-* Show/compare results in one table.
-* Show one (or few) visualization(s) of results, for example ROC curves.
+During the first round of modelling, precision and ROC-AUC were used to evaluate model performance. However, likely a result of high multicolliinearity and data leakage from oversampled rows, early models had perfect precision and very high AUC (0.931). After hyperparameter tuning, this persisted, with a mean precision value of 0.945. Multiple KNN models were used as well and experienced similar, albeit less extreme, overfitting. This was despite heavy feature selection, which involved paring down the number of input features from 22 to 2-4. Multiple selections yielded similar results. In an attept to mitigate this, the data was then aggregated per patient, using mean and variance, and then modelled using Leave One Out train-test split. The perfromance of these models was evaluated through accuracy, the best model during this phase being Random Forest, with an accuracy of 0.844. It should be noted that this value may be inflated due to class imbalances, though the effects of this were attempted to be reduced through tuning the Random Forest model's class weights.
+
+
+
+
+![Average AUC scores during first round of modelling after heavy feature selection; also shows overfitting (precision scores were perfect or near perfect during this phase).](/README_files/prototype_AUC.png)
+
+
+![Model accuracy with aggregated data; different models were trained on mean data vs. variance data vs. a combination of the best features from both.](/README_files/aggregated_models.png)
+
+
 
 ### Conclusions
 
-* State any conclusions you can infer from your work. Example: LSTM work better than GRU.
+Although the initial decision trees used had very high precision and AUC scores, these values may have been inflated by data leakage and a result of overfitting. The random forest model trained on a combination of mean and variance data aggregated per patient is likely more applicable and generalizable despite having a lower accuracy score. Even then, it is difficult to compare these models one-to-one because of the variety of metrics used. 
+
 
 ### Future Work
 
-In the future, I'd like to apply 
+Though options are limited due to the constrained nature/size of the dataset, in the future, I'd like to try better feature selection and engineering methods, to reduce the effects of multicollinearity, as well as use more complex modelling techniques on the aggregated version of the data.
 
 ## How to reproduce results
 
@@ -69,9 +89,9 @@ All necessary data loading, preprocessing, and model evaluation steps are includ
 ### Contents of Repository
 
 * Tabular_Feasibility_ZS.ipynb: Initial exploratory data analysis of data and some preprocessing, including a preliminary baseline model
-* tabular_preprocessing.py: module containing all preprocessing steps done in Tabular_Feasibility_ZS.ipynb
+* tabular_preprocessing.py: module containing functions for all preprocessing steps done in Tabular_Feasibility_ZS.ipynb
 * Tabular_Prototype_ZS.ipynb: contains the first round of modelling
-* Tabular_Aggregated.ipynb: 
+* Tabular_Aggregated.ipynb: contains the separate, final approach to modelling through aggregation of data by patient 
 
 ### Software Setup
 All modelling and data manipulation was done using scikit-learn, pandas, and numpy. Majority of visualizations were completed with matplotlib.
