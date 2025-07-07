@@ -34,10 +34,15 @@ Initial preprocessing (i.e., outlined in tabular_preprocessing.py) included remo
 
 #### Data Visualization
 
-![Comparison of feature distributions between binary features during EDA.](/README_files/compare_binary.png)
+![](/README_files/compare_binary.png)
+
+**Comparison of feature distributions between binary features during EDA.**
 
 
-![Baseline model confusion matrix showing overfitting.](/README_files/baseline_cmatrix.png)
+
+![](/README_files/baseline_cmatrix.png)
+
+**Baseline model confusion matrix showing overfitting.**
 
 
 
@@ -58,11 +63,15 @@ During the first round of modelling, precision and ROC-AUC were used to evaluate
 
 
 
-![Average AUC scores during first round of modelling after heavy feature selection; also shows overfitting (precision scores were perfect or near perfect during this phase).](/README_files/prototype_AUC.png)
+![](/README_files/prototype_AUC.png)
+
+**Average AUC scores during first round of modelling after heavy feature selection; also shows overfitting (precision scores were perfect or near perfect during this phase).**
 
 
-![Model accuracy with aggregated data; different models were trained on mean data vs. variance data vs. a combination of the best features from both.](/README_files/aggregated_models.png)
 
+![](/README_files/aggregated_models.png)
+
+**Model accuracy with aggregated data; different models were trained on mean data vs. variance data vs. a combination of the best features from both.**
 
 
 ### Conclusions
@@ -103,8 +112,4 @@ The data can be downloaded on its [UCI webpage](https://archive.ics.uci.edu/data
 ## Citations
 
 Little, Max. "Parkinsons." UCI Machine Learning Repository, 2007, https://doi.org/10.24432/C59C74.
-
-
-
-
 
